@@ -1,0 +1,516 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+
+public class CharacterAnimation extends JPanel implements KeyListener {
+    private int x;
+    private int y;
+    private int speed;
+    private int health;
+    private int boxOffset;
+    private int killCount; 
+    
+    private boolean pullingBox;
+    private boolean releasingBox;
+    private boolean swingingWeapon; 
+    private boolean hasWon;
+    private Box box;
+
+    private Enemy enemy1;
+    private Enemy enemy2;
+    private Weapon weapon; 
+
+    private BufferedImage characterImage;
+    private BufferedImage backgroundImage;
+    private BufferedImage groundImage;
+    private BufferedImage weaponImage; 
+
+    public CharacterAnimation() {
+        x = -5;
+        y = 770;
+        speed = 5;
+        health = 100;
+        pullingBox = false;
+        releasingBox = false;
+        swingingWeapon = false;
+        boxOffset = 0;
+
+        setPreferredSize(new Dimension(1920, 1080));
+
+        setFocusable(true);
+        addKeyListener(this);
+
+        try {
+            characterImage = ImageIO.read(new File("C:\\Users\\ADMIN\\Documents\\NetBeansProjects\\images\\character.png"));
+            backgroundImage = ImageIO.read(new File("C:\\Users\\ADMIN\\Documents\\NetBeansProjects\\images\\bg_5.png"));
+            groundImage = ImageIO.read(new File("C:\\Users\\ADMIN\\Documents\\NetBeansProjects\\images\\sand_1.png"));
+            weaponImage = ImageIO.read(new File("C:\\Users\\ADMIN\\Documents\\NetBeansProjects\\images\\sword_1.png")); 
+            enemy1 = new Enemy1(700, 520, 2, 150, 250, "C:\\Users\\ADMIN\\Documents\\NetBeansProjects\\images\\enemy.png");
+            enemy2 = new Enemy2(700, 520, 2, 200, 250, "C:\\Users\\ADMIN\\Documents\\NetBeansProjects\\images\\monster_1.png");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        box = new Box(700, 750);
+        
+        weapon = new Weapon(); 
+
+        Timer timer = new Timer(10, e -> {
+            if (releasingBox) {
+                boxOffset = x - box.getX();
+            }
+            enemy1.move();
+            enemy2.move();
+            repaint();
+        });
+        timer.start();
+    }
+    
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), null);
+        }
+
+        if (groundImage != null) {
+            g.drawImage(groundImage, 0, getHeight() - groundImage.getHeight() - -300, getWidth(), groundImage.getHeight(), null);
+        }
+
+        if (box != null && box.getImage() != null) {
+            int boxX = box.getX() + boxOffset;
+            if (pullingBox || releasingBox) {
+                boxX = x + characterImage.getWidth() / 2 - box.getWidth() / 2 + box.getCharacterXOffset() / 1;
+            }
+            g.drawImage(box.getImage(), boxX, box.getY(), box.getWidth(), box.getHeight(), null);
+        }
+
+        if (enemy1 != null && enemy1.getImage() != null) {
+            g.drawImage(enemy1.getImage(), enemy1.getX(), enemy1.getY(), enemy1.getWidth(), enemy1.getHeight(), null);
+        }
+        
+        if (enemy2 != null && enemy2.getImage() != null) {
+        g.drawImage(enemy2.getImage(), enemy2.getX(), enemy2.getY(), enemy2.getWidth(), enemy2.getHeight(), null);
+        }
+
+        if (characterImage != null) {
+            int imageWidth = 150;
+            int imageHeight = 250;
+            g.drawImage(characterImage, x, y - imageHeight, imageWidth, imageHeight, null);
+        }
+
+        if (swingingWeapon && weaponImage != null) {
+            int weaponX = x + characterImage.getWidth() / 2 - weaponImage.getWidth() / 2;
+            int weaponY = y - weaponImage.getHeight();
+            g.drawImage(weaponImage, weaponX, weaponY, null);
+        }
+        
+        if (hasWon) {
+        Font winFont = new Font("Arial", Font.BOLD, 50);
+        FontMetrics winMetrics = g.getFontMetrics(winFont);
+        int winTextWidth = winMetrics.stringWidth("You have reached the end of the journey. Thank you for playing!");
+        int winTextX = (getWidth() - winTextWidth) / 2;
+        int winTextY = getHeight() / 2;
+
+        g.setColor(Color.GREEN);
+        g.setFont(winFont);
+        g.drawString("You have reached the end of the journey. Thank you for playing!", winTextX, winTextY);
+    }
+
+        releasingBox = false;
+        String killCountText = "Kills: " + killCount;
+        Font font = new Font("Arial", Font.BOLD, 20);
+        g.setColor(Color.WHITE);
+        g.setFont(font);
+        FontMetrics metrics = g.getFontMetrics(font);
+        int textWidth = metrics.stringWidth(killCountText);
+        g.drawString(killCountText, getWidth() - textWidth - 10, 25);
+    }
+
+    public int getHealth() {
+        return health;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
+    public void moveLeft() {
+        x -= speed;
+        repaint();
+    }
+    
+    public void moveLeft(int distance){
+        x -= distance;
+        repaint();
+    }
+
+    public void moveRight() {
+        x += speed;
+        
+         if (x >= getWidth()) {
+        x = -characterImage.getWidth();
+        scene_2();
+        }
+        repaint();
+    }
+    private void scene_2() {
+    
+    try {
+        backgroundImage = ImageIO.read(new File("C:\\Users\\ADMIN\\Documents\\NetBeansProjects\\images\\new_bg.png"));
+        groundImage = ImageIO.read(new File("C:\\Users\\ADMIN\\Documents\\NetBeansProjects\\images\\new_ground.png"));
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    enemy1 = null;
+    enemy2 = null;
+    hasWon = true;
+    
+    repaint();
+    
+    
+}
+    public void pullBox() {
+        if (!pullingBox) {
+            pullingBox = true;
+            repaint();
+        }
+    }
+
+    public void releaseBox() {
+        if (pullingBox) {
+            pullingBox = false;
+            releasingBox = true;
+            boxOffset = x - box.getX();
+            repaint();
+        }
+    }
+
+    public void swingWeapon() {
+        if (!swingingWeapon) {
+            swingingWeapon = true;
+            repaint();
+            Timer timer = new Timer(300, e -> {
+                swingingWeapon = false;
+                checkCollision();
+                repaint();
+            });
+            timer.setRepeats(false);
+            timer.start();
+        }
+    }
+    private void checkCollision() {
+        Rectangle weaponBounds = new Rectangle(x, y - weaponImage.getHeight(), weaponImage.getWidth(), weaponImage.getHeight() + weaponImage.getHeight());
+        Rectangle enemy1Bounds = new Rectangle(enemy1.getX(), enemy1.getY(), enemy1.getWidth(), enemy1.getHeight());
+        Rectangle enemy2Bounds = new Rectangle(enemy2.getX(), enemy2.getY(), enemy2.getWidth(), enemy2.getHeight());
+        
+    if (weaponBounds.intersects(enemy1Bounds)) {
+        enemy1 = null;
+        killCount++;
+        reset1();
+    }
+    
+    if (weaponBounds.intersects(enemy2Bounds)){
+        enemy2 = null;
+        killCount ++;
+        reset2();
+    }
+    
+    
+    
+    Enemy[] enemies = {enemy1, enemy2};
+    for (Enemy enemy : enemies) {
+    if (enemy != null) {
+        enemy.move();
+        
+        }
+    
+    }
+    
+
+}
+    private void reset1() {
+    setEnabled(true);
+    
+    int delay1 = 5000;
+    
+
+    Timer timer1 = new Timer(delay1, e -> {
+        if (enemy1 == null) {
+            enemy1 = new Enemy1(700, 520, 1, 150, 250, "C:\\Users\\ADMIN\\Documents\\NetBeansProjects\\images\\enemy_1.png");
+            Timer enemy1MoveTimer = new Timer(10, evt -> {
+                enemy1.move();
+                repaint();
+            });
+            enemy1MoveTimer.start();
+        }
+    });
+    timer1.setRepeats(false);
+    timer1.start();
+    
+    if (enemy2 != null){
+        Timer enemy2MoveTimer = new Timer(10, evt -> {
+            enemy2.move();
+            repaint();
+        });
+        enemy2MoveTimer.start();
+    }
+}
+
+    private void reset2() {
+    int delay2 = 5000;
+
+    Timer timer2 = new Timer(delay2, e -> {
+        if (enemy2 == null) {
+            enemy2 = new Enemy2(600, 520, 1, 225, 250, "C:\\Users\\ADMIN\\Documents\\NetBeansProjects\\images\\monster_1.png");
+            Timer enemy2MoveTimer = new Timer(10, evt -> {
+                enemy2.move();
+                repaint();
+            });
+            enemy2MoveTimer.start();
+        }
+    });
+    timer2.setRepeats(false);
+    timer2.start();
+    
+    if (enemy1 != null){
+        Timer enemy1MoveTimer = new Timer(10, evt -> {
+            enemy1.move();
+            repaint();
+        });
+        enemy1MoveTimer.start();
+    }
+}
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+        
+        if (keyCode == KeyEvent.VK_A) {
+            moveLeft();
+        }
+        if (keyCode == KeyEvent.VK_D) {
+            moveRight();
+        }
+        if (keyCode == KeyEvent.VK_E) {
+            pullBox();
+        }
+        if (keyCode == KeyEvent.VK_Q) {
+            releaseBox();
+        }
+        if (keyCode == KeyEvent.VK_F) {
+            swingWeapon();
+        }
+    }
+    @Override
+    public void keyReleased(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+        if (keyCode == KeyEvent.VK_Q) {
+            
+            releaseBox();
+            
+        }
+    }
+    @Override
+    
+    public void keyTyped(KeyEvent e) {
+    
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Character Animation");
+            CharacterAnimation character = new CharacterAnimation();
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.getContentPane().add(character);
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        });
+    }
+}
+
+class Box {
+    private int x;
+    private int y;
+    private int width;
+    private int height;
+    private BufferedImage image;
+    private int characterXOffset;
+
+    public Box(int width, int height) {
+        this.width = width;
+        this.height = height;
+
+        try {
+            image = ImageIO.read(new File("C:\\Users\\ADMIN\\Documents\\NetBeansProjects\\images\\box_1.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setPosition(int x, int y, int characterXOffset) {
+        this.x = x;
+        this.y = y;
+        this.characterXOffset = characterXOffset;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    public int getCharacterXOffset() {
+        return characterXOffset;
+    }
+}
+
+abstract class Enemy {
+    protected int x;
+    protected int y;
+    protected int speed;
+    protected int width;
+    protected int height;
+    protected BufferedImage image;
+
+    public Enemy(int x, int y, int speed, int width, int height, String imagePath) {
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.width = width;
+        this.height = height;
+
+        try {
+            image = ImageIO.read(new File(imagePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public abstract void move();
+    
+    
+    
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public BufferedImage getImage() {
+        return image;
+    }
+}
+
+class Enemy1 extends Enemy {
+    private final int initialX; 
+
+    public Enemy1(int x, int y, int speed, int width, int height, String imagePath) {
+        super(x, y, speed, width, height, imagePath);
+        initialX = x; 
+    }
+
+    @Override
+    public void move() {
+        x -= speed;
+        if (x + width <= 0) { 
+            respawn(); 
+        }
+    }
+
+    private void respawn() {
+        x = initialX; 
+    }
+}
+
+
+class Enemy2 extends Enemy {
+    
+    
+    public Enemy2(int x, int y, int speed, int width, int height, String imagePath) {
+        super(x, y, speed, width, height, imagePath);
+    }
+
+    @Override
+    public void move() {
+        x += speed;
+        if (x >= 1920) {
+            x = -width;
+        } else if (x <= -width) {
+            x = 1920;
+        }
+    }
+}
+class Weapon {
+    private BufferedImage image;
+    private int swingOffset;
+    private boolean isSwinging;
+
+    public Weapon() {
+        try {
+            image = ImageIO.read(new File("C:\\Users\\ADMIN\\Documents\\NetBeansProjects\\images\\weapon_3.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    public int getSwingOffset() {
+        return swingOffset;
+    }
+
+    public void setSwingOffset(int swingOffset) {
+        this.swingOffset = swingOffset;
+    }
+
+    public boolean isSwinging() {
+        return isSwinging;
+    }
+
+    public void setSwinging(boolean swinging) {
+        isSwinging = swinging;
+    }
+}
