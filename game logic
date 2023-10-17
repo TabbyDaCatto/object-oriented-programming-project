@@ -1,0 +1,116 @@
+ private void checkCollision() {
+        Rectangle weaponBounds = new Rectangle(x, y - weaponImage.getHeight(), weaponImage.getWidth(), weaponImage.getHeight() + weaponImage.getHeight());
+        Rectangle enemy1Bounds = new Rectangle(enemy1.getX(), enemy1.getY(), enemy1.getWidth(), enemy1.getHeight());
+        Rectangle enemy2Bounds = new Rectangle(enemy2.getX(), enemy2.getY(), enemy2.getWidth(), enemy2.getHeight());
+        
+    if (weaponBounds.intersects(enemy1Bounds)) {
+        enemy1 = null;
+        killCount++;
+        reset1();
+    }
+    
+    if (weaponBounds.intersects(enemy2Bounds)){
+        enemy2 = null;
+        killCount ++;
+        reset2();
+    }
+    
+    
+    
+    Enemy[] enemies = {enemy1, enemy2};
+    for (Enemy enemy : enemies) {
+    if (enemy != null) {
+        enemy.move();
+        
+        }
+    
+    }
+    
+
+}
+    private void reset1() {
+    setEnabled(true);
+    
+    int delay1 = 5000;
+    
+
+    Timer timer1 = new Timer(delay1, e -> {
+        if (enemy1 == null) {
+            enemy1 = new Enemy1(700, 520, 1, 150, 250, "C:\\Users\\ADMIN\\Documents\\NetBeansProjects\\images\\enemy_1.png");
+            Timer enemy1MoveTimer = new Timer(10, evt -> {
+                enemy1.move();
+                repaint();
+            });
+            enemy1MoveTimer.start();
+        }
+    });
+    timer1.setRepeats(false);
+    timer1.start();
+    
+    if (enemy2 != null){
+        Timer enemy2MoveTimer = new Timer(10, evt -> {
+            enemy2.move();
+            repaint();
+        });
+        enemy2MoveTimer.start();
+    }
+}
+
+    private void reset2() {
+    int delay2 = 5000;
+
+    Timer timer2 = new Timer(delay2, e -> {
+        if (enemy2 == null) {
+            enemy2 = new Enemy2(600, 520, 1, 225, 250, "C:\\Users\\ADMIN\\Documents\\NetBeansProjects\\images\\monster_1.png");
+            Timer enemy2MoveTimer = new Timer(10, evt -> {
+                enemy2.move();
+                repaint();
+            });
+            enemy2MoveTimer.start();
+        }
+    });
+    timer2.setRepeats(false);
+    timer2.start();
+    
+    if (enemy1 != null){
+        Timer enemy1MoveTimer = new Timer(10, evt -> {
+            enemy1.move();
+            repaint();
+        });
+        enemy1MoveTimer.start();
+    }
+}
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+        
+        if (keyCode == KeyEvent.VK_A) {
+            moveLeft();
+        }
+        if (keyCode == KeyEvent.VK_D) {
+            moveRight();
+        }
+        if (keyCode == KeyEvent.VK_E) {
+            pullBox();
+        }
+        if (keyCode == KeyEvent.VK_Q) {
+            releaseBox();
+        }
+        if (keyCode == KeyEvent.VK_F) {
+            swingWeapon();
+        }
+    }
+    @Override
+    public void keyReleased(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+        if (keyCode == KeyEvent.VK_Q) {
+            
+            releaseBox();
+            
+        }
+    }
+    @Override
+    
+    public void keyTyped(KeyEvent e) {
+    
+    }
