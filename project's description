@@ -1,0 +1,404 @@
+🎮 The project aims to create an interactive animation where the player controls a character. 
+The project incorporates various features such as character movement, interaction with objects like boxes and weapons, enemy entities, and scene changes. 
+The animation is implemented using Java Swing and AWT libraries, allowing for graphical rendering and user input handling. 
+
+💜Libraries and frameworks that I used:
+-	Java Swing: Provides the graphical user interface components and functionality.
+-	Java AWT: Supports basic windowing toolkit operations and image loading.
+-	javax.swing.Timer: Used for animation and periodic updates.
+-	javax.imageio.ImageIO: Enables the loading and manipulation of images.
+
+⭐ OOP features I used inside this project:
+1.	Encapsulation: The project demonstrates encapsulation by encapsulating the character's attributes, such as position, speed, health, and interactions with objects and enemies, within the CharacterAnimation class.
+These attributes are private and can only be accessed and modified through appropriate getter and setter methods, ensuring data integrity and abstraction.
+
+private int x;
+private int y;
+private int speed;
+private int health;
+// ...
+
+public int getHealth() {
+    return health;
+}
+
+public void setHealth(int health) {
+    this.health = health;
+}
+
+2.	Information Hiding: Information hiding is achieved by declaring certain variables and methods as private or protected, preventing direct access from outside the class. 
+The project hides internal implementation details of classes, such as Box, Enemy, and Weapon, exposing only the necessary public methods for interaction and obtaining information.
+
+
+private int y;
+    private int speed;
+    private int health;
+    private int boxOffset;
+    private int killCount; 
+    
+    private boolean pullingBox;
+    private boolean releasingBox;
+    private boolean swingingWeapon; 
+    private boolean hasWon;
+    private Box box;
+    private Enemy enemy1;
+    private Enemy enemy2;
+    private Weapon weapon; 
+
+    private BufferedImage characterImage;
+    private BufferedImage backgroundImage;
+    private BufferedImage groundImage;
+    private BufferedImage weaponImage; 
+
+3.	Inheritance: Inheritance is utilized to establish an "is-a" relationship between classes. 
+The project implements inheritance to create specialized classes like Enemy1 and Enemy2 that inherit from the base Enemy class. This inheritance relationship allows for code reuse and promotes modularity.
+
+class Enemy1 extends Enemy {
+    // ...
+
+    // Inherits attributes and methods from the Enemy class
+
+    // ...
+}
+
+class Enemy2 extends Enemy {
+    // ...
+
+    // Inherits attributes and methods from the Enemy class
+
+    // ...
+}
+
+4.	Subtyping: The project incorporates subtyping by using polymorphism to treat derived classes as instances of their base class. 
+For example, objects of type Enemy1 and Enemy2 can be treated as instances of the Enemy class, allowing for flexibility and modularity in the code.Abstraction:
+
+Enemy enemy1 = new Enemy1();
+
+Enemy enemy2 = new Enemy2();
+
+5.	Polymorphism: The project demonstrates polymorphism using abstract classes and method overriding. 
+The abstract class Enemy serves as a common base for different enemy types (Enemy1 and Enemy2), allowing for polymorphic behavior and shared functionality. 
+Each enemy type overrides the move() method to define its unique movement behavior.
+
+abstract class Enemy {
+    protected int x;
+    protected int y;
+    protected int speed;
+    protected int width;
+    protected int height;
+    protected BufferedImage image;
+
+    public Enemy(int x, int y, int speed, int width, int height, String im-agePath) {
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.width = width;
+        this.height = height;
+
+        try {
+            image = ImageIO.read(new File(imagePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public abstract void move();
+    
+    
+    
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public BufferedImage getImage() {
+        return image;
+    }
+}
+
+
+class Enemy1 extends Enemy {
+    private int final initialX; 
+
+    public Enemy1(int x, int y, int speed, int width, int height, String im-agePath) {
+        super(x, y, speed, width, height, imagePath);
+        initialX = x; 
+    }
+
+    @Override
+    public void move() {
+        x -= speed;
+        if (x + width <= 0) { 
+            respawn(); 
+        }
+    }
+
+    private void respawn() {
+        x = initialX; 
+    }
+}
+
+
+
+
+class Enemy2 extends Enemy {
+    
+    
+    public Enemy2(int x, int y, int speed, int width, int height, String im-agePath) {
+        super(x, y, speed, width, height, imagePath);
+    }
+
+    @Override
+    public void move() {
+        x += speed;
+        if (x >= 1920) {
+            x = -width;
+        } else if (x <= -width) {
+            x = 1920;
+        }
+    }
+}
+
+
+Enemy[] enemies = {enemy1, enemy2};
+    for (Enemy enemy : enemies) {
+    if (enemy != null) {
+        enemy.move();
+        
+        }
+    
+    }
+
+6.	Composition: The project utilizes composition to model relationships between different entities. 
+For example, the CharacterAnimation class contains instances of the Box, Enemy, and Weapon classes, representing the composition of these entities within the game environment.
+
+public class CharacterAnimation extends JPanel implements KeyListener {
+    //...
+
+    private Box box;
+    private Enemy enemy1;
+    private Enemy enemy2;
+    private Weapon weapon;
+
+    //...
+
+    public CharacterAnimation() {
+        //...
+        box = new Box(700, 750);
+        weapon = new Weapon();
+        //...
+    }
+
+    //...
+}
+
+7.	Exception Handling: The project implements exception handling to handle potential errors and exceptional scenarios. 
+For instance, when loading images using the ImageIO class, exceptions such as IOException are caught and appropriate error handling is performed, ensuring smooth execution of the animation.
+
+try {
+    BufferedImage image = ImageIO.read(new File("image.png"));
+    // ...
+} catch (IOException e) {
+    // Handle exception
+    // ...
+}
+
+8.	Extendibility: Example: The code structure allows for easy extendibility by adding new classes that are inherited from existing ones. 
+For example, I could create new enemy types by extending the Enemy class, defining their specific properties and behaviors.
+
+9.	  Abstraction: Abstraction is employed throughout the project by creating abstract classes and methods that provide a high-level representation of entities and their behaviors. 
+For instance, the Enemy class is an abstract class that defines common properties and methods shared by all enemy types, while leaving the specific implementation details to the derived classes.
+
+abstract class Enemy {
+    protected int x;
+    protected int y;
+
+    public abstract void move();
+    // ...
+
+    // Common methods and attributes
+
+    // ...
+}
+
+10.	Overloading: allows me to define multiple methods with the same name but different parameters or argument lists. 
+In my case, I have two methods named moveLeft, but they accept different parameters: one with no parameters and one with an integer parameter named distance. 
+This allows me to call the appropriate method based on the desired behavior I need.
+
+public void moveLeft() {
+        x -= speed;
+        repaint();
+  }
+    
+public void moveLeft(int distance){
+        x -= distance;
+        repaint();
+  }
+  
+11.	Overriding: the keyPressed method is overridden from the KeyListener interface. This method is called when a key is pressed.
+It takes a KeyEvent object as a parameter, which provides information about the key event. 
+By overriding the keyPressed method, the CharacterAnimation class can respond to key events and perform specific actions based on the key pressed by the user.
+
+@Override
+public void keyPressed(KeyEvent e) {
+    int keyCode = e.getKeyCode();
+    
+    if (keyCode == KeyEvent.VK_A) {
+        moveLeft();
+    }
+    if (keyCode == KeyEvent.VK_D) {
+        moveRight();
+    }
+    if (keyCode == KeyEvent.VK_E) {
+        pullBox();
+    }
+    if (keyCode == KeyEvent.VK_Q) {
+        releaseBox();
+    }
+    if (keyCode == KeyEvent.VK_F) {
+        swingWeapon();
+    }
+}
+
+12.	Parametric method example: 
+
+public void moveLeft(int distance){
+    x -= distance;
+    repaint();
+}
+
+This method takes an “int” parameter named distance, which represents the distance by which the character should move to the left.
+It updates the x coordinate of the character by subtracting the distance value and then calls the repaint() method to update the animation on the screen.
+
+13.	Static methods: In my code, there is no explicit static method defined. However, there is a “main” method, which is implicitly static.
+The “main” method is static because it belongs to the class itself and can be called without creating an instance of the class. 
+
+public static void main(String[] args) {
+    // Code for initializing and running the program
+}
+
+15.	Polymorphism by inclusion: 
+
+abstract class Enemy<T extends Enemy<T>> {
+    protected int x;
+    protected int y;
+    protected int speed;
+    protected int width;
+    protected int height;
+    protected BufferedImage image;
+
+    public Enemy(int x, int y, int speed, int width, int height, String im-agePath) {
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.width = width;
+        this.height = height;
+
+        try {
+            image = ImageIO.read(new File(imagePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public abstract void move();
+    
+    
+    
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public BufferedImage getImage() {
+        return image;
+    }
+    public abstract T respawn();
+}
+
+16.	Parametric Polymorphism: 
+
+class Weapon<T> {
+
+    private T image; 
+    private int swingOffset;
+    private boolean isSwinging;
+
+    public Weapon(T image, int swingOffset, boolean isSwinging) {
+        try {
+            if (image instanceof String) {
+                this.image = (T) ImageIO.read(new File((String) image));
+            } else {
+                
+                throw new IllegalArgumentException("Unsupported image type: " + image.getClass());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.swingOffset = swingOffset;
+        this.isSwinging = isSwinging;
+    }
+
+    public T getImage() {
+        return image;
+    }
+
+    public int getSwingOffset() {
+        return swingOffset;
+    }
+
+    public void setSwingOffset(int swingOffset) {
+        this.swingOffset = swingOffset;
+    }
+
+    public boolean isSwinging() {
+        return isSwinging;
+    }
+
+    public void setSwinging(boolean swinging) {
+        isSwinging = swinging;
+    }
+
+    
+    public static void main(String[] args) {
+        Weapon<String> weapon1 = new Weap-on<>("C:\\Users\\ADMIN\\Documents\\NetBeansProjects\\images\\weapon_3.png", 10, true);
+        //Weapon<BufferedImage> weapon2 = new Weapon<>(ImageIO.read(new File("weapon2.png")), 20, false);
+
+        
+        System.out.println(weapon1.getImage());
+        //System.out.println(weapon2.getSwingOffset());
+    }
+}
+
+
+
+
+
+
+
+
+
