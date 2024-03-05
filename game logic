@@ -114,3 +114,13 @@
     public void keyTyped(KeyEvent e) {
     
     }
+
+
+
+The checkCollision() method is responsible for detecting collisions between the player's weapon and the enemies.
+-	Rectangle Bounds: Three Rectangle objects are created to represent the bounding boxes of the player's weapon (weaponBounds), enemy1 (enemy1Bounds), and enemy2 (enemy2Bounds).
+-	Intersection Check: The intersects() method is used to check if the weapon's bounding box intersects with the bounding boxes of enemy1 or enemy2.
+-	Enemy Respawn: Inside the reset1() method, a delay is set (in this case, 5000 milliseconds or 5 seconds) to control the timing of the enemy's respawn. After the delay, if enemy1 is still null, a new instance of Enemy1 is created at a specific position (new Enemy1(700, 520, 1, 150, 250,
+-	Similar logic is applied in the reset2() method to handle collisions and respawning for enemy2.
+-	Moving Remaining Enemies: After handling collisions and respawning, a loop iterates over the array of enemies (enemy1 and enemy2). If an enemy object is not null, its move() method is called to update its position.
+
